@@ -12,6 +12,7 @@ import ChatListPage from './pages/chat-list-page';
 import ChatRoomPage from './pages/chat-room-page';
 import NotificationsPage from './pages/notifications-page';
 import SearchPage from './pages/search-page';
+import CompleteProfilePage from './pages/complete-profile-page';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 
+      <Route path="/complete-profile" element={<ProtectedRoute><CompleteProfilePage /></ProtectedRoute>} />
       <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
       <Route path="/posts" element={<ProtectedRoute><PostListPage /></ProtectedRoute>} />
       <Route path="/posts/new" element={<ProtectedRoute><PostWritePage /></ProtectedRoute>} />

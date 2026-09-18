@@ -16,6 +16,7 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -33,8 +34,11 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!session?.user?.id) {
       setProfile(null);
+      setIsProfileLoading(false);
       return;
     }
+
+    setIsProfileLoading(true);
 
     supabase
       .from('cu_profiles')
@@ -44,11 +48,16 @@ export function AuthProvider({ children }) {
       .then(async ({ data }) => {
         if (data) {
           setProfile(data);
+          setIsProfileLoading(false);
           return;
         }
 
         const pendingRaw = window.localStorage.getItem('chuus_pending_profile');
-        if (!pendingRaw) return;
+        if (!pendingRaw) {
+          setProfile(null);
+          setIsProfileLoading(false);
+          return;
+        }
 
         const pending = JSON.parse(pendingRaw);
         const { data: created } = await supabase
@@ -59,6 +68,7 @@ export function AuthProvider({ children }) {
 
         window.localStorage.removeItem('chuus_pending_profile');
         setProfile(created ?? null);
+        setIsProfileLoading(false);
       });
   }, [session?.user?.id]);
 
@@ -67,6 +77,7 @@ export function AuthProvider({ children }) {
     user: session?.user ?? null,
     profile,
     isLoading,
+    isProfileLoading,
     refreshProfile: async () => {
       if (!session?.user?.id) return;
       const { data } = await supabase

@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { useAuth } from '../../hooks/use-auth';
@@ -13,9 +13,10 @@ import { useAuth } from '../../hooks/use-auth';
  * <ProtectedRoute><HomePage /></ProtectedRoute>
  */
 export default function ProtectedRoute({ children }) {
-  const { session, isLoading } = useAuth();
+  const { session, isLoading, profile, isProfileLoading } = useAuth();
+  const location = useLocation();
 
-  if (isLoading) {
+  if (isLoading || (session && isProfileLoading)) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <CircularProgress color="primary" />
@@ -25,6 +26,10 @@ export default function ProtectedRoute({ children }) {
 
   if (!session) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (!profile && location.pathname !== '/complete-profile') {
+    return <Navigate to="/complete-profile" replace />;
   }
 
   return children;
